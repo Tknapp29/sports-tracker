@@ -21,6 +21,10 @@
     <li><strong>utils.js:</strong> Contains helper functions for various tasks and formatting</li>
     <li><strong>server.js:</strong> Runs the Express server, serves the frontend, retrieves ESPN data, and handles AI prediction requests</li>
 </ul>
+<h3>Images</h3>
+<ul>
+    <li><strong>favicon.png:</strong> Favicon for the site (source: pngtree.com)</li>
+</ul>
 <h2>Required Before Running</h2>
 <ul>
     <li>Node.js</li>
