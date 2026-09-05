@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sports Tracker</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" defer></script>
+  <script src="../JavaScript/state.js"></script>
+  <script src="../JavaScript/utils.js"></script>
+  <script src="../JavaScript/favorites.js"></script>
+  <script src="../JavaScript/data.js"></script>
+  <script src="../JavaScript/ai.js"></script>
+  <script src="../JavaScript/render.js"></script>
+  <script src="../JavaScript/navigation.js"></script>
+  <script src="../JavaScript/main.js"></script>
+  <link rel="stylesheet" href="../CSS/styles.css">
+</head>
+
+<body>
+  <div class="table-wrapper">
+    <div class="d-flex justify-content-center align-items-center mb-3">
+      <h2 class="mb-0">Live Sports Tracking</h2>
+    </div>
+
+    <div class="d-flex flex-column align-items-center mb-3">
+      <!-- League Navigation -->
+      <div class="d-flex justify-content-center mb-3">
+        <div class="btn-group league-toggle" role="group" aria-label="League selector" id="leagueToggle">
+
+          <input type="radio" class="btn-check" name="league" id="league-all" value="all" autocomplete="off">
+          <label class="btn btn-outline-primary" for="league-all">Today</label>
+
+          <input type="radio" class="btn-check" name="league" id="league-mlb" value="mlb" autocomplete="off" checked>
+          <label class="btn btn-outline-primary" for="league-mlb">MLB</label>
+
+          <input type="radio" class="btn-check" name="league" id="league-nba" value="nba" autocomplete="off">
+          <label class="btn btn-outline-primary" for="league-nba">NBA</label>
+
+          <input type="radio" class="btn-check" name="league" id="league-nfl" value="nfl" autocomplete="off">
+          <label class="btn btn-outline-primary" for="league-nfl">NFL</label>
+
+          <input type="radio" class="btn-check" name="league" id="league-nhl" value="nhl" autocomplete="off">
+          <label class="btn btn-outline-primary" for="league-nhl">NHL</label>
+
+          <input type="radio" class="btn-check" name="league" id="league-favorites" value="favorites"
+            autocomplete="off">
+          <label class="btn btn-outline-primary" for="league-favorites">★ Favorites</label>
+        </div>
+      </div>
+
+      <!-- Games / Rankings Navigation -->
+      <div class="d-flex justify-content-center mb-3" id="rankingsNav">
+        <div class="btn-group view-toggle" role="group" aria-label="View selector">
+          <input type="radio" class="btn-check" name="view" id="view-games" value="games" autocomplete="off" checked>
+          <label class="btn btn-outline-secondary btn-sm" for="view-games">Games</label>
+
+          <input type="radio" class="btn-check" name="view" id="view-rankings" value="rankings" autocomplete="off">
+          <label class="btn btn-outline-secondary btn-sm" for="view-rankings">View Rankings</label>
+        </div>
+      </div>
+
+      <!-- Rankings Content -->
+      <div id="rankingsSection" style="display:none;">
+        <div id="rankingsBody"></div>
+      </div>
+    </div>
+
+    <div id="dayNav" class="d-flex justify-content-center align-items-center gap-3 mb-3">
+      <button id="prevDayBtn" class="btn btn-outline-secondary btn-sm" aria-label="Previous day">&larr;</button>
+      <span id="currentDateLabel" class="fw-semibold"></span>
+      <button id="nextDayBtn" class="btn btn-outline-secondary btn-sm" aria-label="Next day">&rarr;</button>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-2" style="max-width: 1100px; margin: 0 auto;">
+    <div id="statusMsg" class="text-muted small mb-0"></div>
+    <button id="refreshBtn" class="btn nav-icon-btn" aria-label="Refresh scores" title="Refresh">
+      <i class="bi bi-arrow-clockwise"></i>
+    </button>
+  </div>
+
+  <div id="resultsSection">
+    <div class="table-wrapper">
+      <div class="table-responsive">
+        <table class="table table-bordered roles-table" id="gamesTable">
+          <thead class="table-dark">
+            <tr>
+              <th>Time</th>
+              <th>Matchup</th>
+              <th>Score</th>
+              <th>Status</th>
+              <th>Where to Watch</th>
+            </tr>
+          </thead>
+          <tbody id="gamesTableBody">
+            <!-- Rows are populated dynamically from /api/games -->
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted small">Hover over a row to highlight it. Data provided by ESPN's public scoreboard API.</p>
+    </div>
+  </div>
+
+  <div id="noUpcomingMsg" style="display: none;">
+    <h5 class="text-muted" id="noUpcomingText">No upcoming games scheduled.</h5>
+  </div>
+
+  <!-- Game detail modal-->
+  <div class="modal fade" id="gameStatsModal" tabindex="-1" aria-labelledby="gameStatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header align-items-end">
+          <div>
+            <h5 class="modal-title mb-2" id="gameStatsModalLabel">Game Details</h5>
+            <ul class="nav nav-tabs card-header-tabs" id="gameDetailTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats-panel"
+                  type="button" role="tab" aria-controls="stats-panel" aria-selected="true">Stats</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="odds-tab" data-bs-toggle="tab" data-bs-target="#odds-panel" type="button"
+                  role="tab" aria-controls="odds-panel" aria-selected="false">Betting Odds</button>
+              </li>
+            </ul>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="stats-panel" role="tabpanel" aria-labelledby="stats-tab">
+              <div id="gameStatsModalBody"><!-- populated dynamically --></div>
+            </div>
+            <div class="tab-pane fade" id="odds-panel" role="tabpanel" aria-labelledby="odds-tab">
+              <div id="gameOddsModalBody"><!-- populated dynamically --></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

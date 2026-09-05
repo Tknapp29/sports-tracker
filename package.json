@@ -1,0 +1,13 @@
+{
+  "name": "roles-and-scores",
+  "version": "1.0.0",
+  "description": "Server that serves index.html",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2"
+  }
+}
